@@ -24,14 +24,7 @@ def train(
     )
 
     # Load dataset
-    X_dataset, y_image = loader.load_dataset()
-
-    # Extract feature targets
-    style_targets = extractor(y_image)["style"]
-    style_targets = [
-        tf.repeat(style_target, [config.BATCH_SIZE], axis=0)
-        for style_target in style_targets
-    ]
+    dataset = loader.load_dataset()
 
     # Initialize model
     model = StyleTransferModel()
@@ -43,21 +36,21 @@ def train(
     checkpoint = tf.train.Checkpoint(model=model, optim=optim)
 
     for epoch in range(epochs):
-        for batch_idx, input_images in enumerate(tqdm(X_dataset)):
-            input_images = input_images[0]
+        for batch_idx, (content_img, style_img) in enumerate(tqdm(dataset)):
             with tf.GradientTape() as tape:
-                generated_images = model(input_images)
+                generated_images = model(content_img)
 
                 # Calculate content and style outputs
                 outputs = extractor(generated_images)
                 content_outputs, style_outputs = outputs["content"], outputs["style"]
 
                 # Calculate content targets
-                content_targets = extractor(input_images)["content"]
+                content_targets = extractor(content_img)["content"]
+                style_targets = extractor(style_img)["style"]
 
                 # Calculate loss
                 loss = losses.feature_style_loss(
-                    input_images=input_images,
+                    input_images=content_img,
                     feature_outputs=content_outputs,
                     style_outputs=style_outputs,
                     feature_targets=content_targets,
@@ -70,7 +63,7 @@ def train(
 
             if (batch_idx + 1) % 1000 == 0 and batch_idx > 0:
                 print(
-                    f"Epoch [{epoch}/{epochs}] Batch {batch_idx}/{len(X_dataset)} \
+                    f"Epoch [{epoch}/{epochs}] Batch {batch_idx}/{len(dataset)} \
                       Content Style Loss: {loss:.4f}"
                 )
 

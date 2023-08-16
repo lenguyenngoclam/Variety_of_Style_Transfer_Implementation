@@ -36,29 +36,33 @@ class DataLoader:
         return dataset
 
     def load_dataset(self):
-        X_dataset = self.feature_img_folder.map(
+        style_img = self.load_image(self.style_image_path)
+        style_img = self.preprocessing_image(style_img)
+
+        dataset = self.feature_img_folder.map(
             lambda x: tf.numpy_function(self.load_image, [x], [tf.float32]),
             num_parallel_calls=tf.data.AUTOTUNE,
         )
 
-        X_dataset = X_dataset.map(
+        dataset = dataset.map(
             lambda x: tf.numpy_function(self.preprocessing_image, [x], [tf.float32]),
             num_parallel_calls=tf.data.AUTOTUNE,
         )
 
-        X_dataset = self.configure_for_performance(X_dataset)
+        # Zip style image with each content images
+        dataset = dataset.map(
+            lambda x: (x, style_img), num_parallel_calls=tf.data.AUTOTUNE
+        )
 
-        y_img = self.load_image(self.style_image_path)
-        y_img = self.preprocessing_image(y_img)
-        y_img = tf.expand_dims(y_img, axis=0)
+        dataset = self.configure_for_performance(dataset)
 
-        return X_dataset, y_img
+        return dataset
 
 
 if __name__ == "__main__":
     loader = DataLoader(
         "../test_image/content_image", "../test_image/style_image/artwork_2.jpeg"
     )
-    X_dataset, y_dataset = loader.load_dataset()
-
-    print(X_dataset, y_dataset)
+    dataset = loader.load_dataset()
+    for batch_idx, data in enumerate(dataset):
+        print(batch_idx, data)

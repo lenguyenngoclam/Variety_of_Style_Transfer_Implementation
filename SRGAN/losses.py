@@ -1,5 +1,7 @@
 import tensorflow as tf
 import config
+import numpy as np 
+import scipy
 
 
 def feature_reconstruction_loss(feature_outputs, feature_targets):
@@ -23,7 +25,7 @@ def gram_matrix(input_tensor):
 def style_reconstruction_loss(style_outputs, style_targets):
     loss = tf.reduce_mean(
         [
-            tf.norm(style_outputs[i] - style_targets[i], ord="fro", axis=(1, 2)) ** 2
+            tf.norm(style_outputs[i] - style_targets[i], ord="euclidean") ** 2
             for i in range(len(style_targets))
         ]
     )
@@ -53,9 +55,13 @@ def feature_style_loss(
 if __name__ == "__main__":
     x = tf.random.uniform([4, 64, 64])
     print(style_reconstruction_loss([x], [x + tf.random.normal([4, 64, 64])]))
-    print(feature_reconstruction_loss([tf.random.uniform([4, 256, 256, 3])], [tf.random.uniform([4, 256, 256, 3])]))
-    print(feature_style_loss(input_images=tf.random.uniform([4, 256, 256, 3], -1.0, 1.0), 
-                feature_outputs=[tf.random.uniform([4, 256, 256, 3])],
+    print(
+        feature_reconstruction_loss(
+            [tf.random.uniform([64, 64, 256])], [tf.random.uniform([64, 64, 256])]
+        )
+    )
+    print(feature_style_loss(input_images=tf.random.uniform([4, 256, 256, 3], -1.0, 1.0),
+                feature_outputs=[tf.random.uniform([64, 64, 256])],
                 style_outputs= [x],
-                feature_targets=[tf.random.uniform([4, 256, 256, 3])],
+                feature_targets=[tf.random.uniform([64, 64, 256])],
                 style_targets=[x + tf.random.normal([4, 64, 64])]))
