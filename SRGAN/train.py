@@ -50,7 +50,7 @@ def train(
 
                 # Calculate loss
                 loss = losses.feature_style_loss(
-                    input_images=input_images,
+                    input_images=content_img,
                     feature_outputs=content_outputs,
                     style_outputs=style_outputs,
                     feature_targets=content_targets,
@@ -63,7 +63,7 @@ def train(
 
             if (batch_idx + 1) % 1000 == 0 and batch_idx > 0:
                 print(
-                    f"Epoch [{epoch}/{epochs}] Batch {batch_idx}/{len(X_dataset)} \
+                    f"Epoch [{epoch}/{epochs}] Batch {batch_idx}/{len(dataset)} \
                       Content Style Loss: {loss:.4f}"
                 )
 
