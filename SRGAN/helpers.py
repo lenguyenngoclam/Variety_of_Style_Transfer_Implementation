@@ -62,11 +62,10 @@ def generate_and_visualize(model, filepath):
 
 
 if __name__ == "__main__":
-    img = load_image("../test_image/content_image/content_image_3.jpeg")
+    model = get_intermediate_layers(config.STYLE_LAYERS)
 
-    img = (img - 127.5) / 127.5
+    outputs = model(tf.random.uniform([4, 256, 256, 3]))
 
-    plt.imshow(tensor_to_image(img))
-    plt.axis("off")
-
-    plt.show()
+    for name, output in zip(config.STYLE_LAYERS, outputs):
+        print(f"Name : {name}")
+        print(f"Shape: {output.shape}")
