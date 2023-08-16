@@ -20,7 +20,7 @@ class StyleTransferModel(keras.models.Model):
                 ConvBlock(
                     filters=32,
                     kernel_size=9,
-                    strides=1,
+                    strides=2,
                     padding_type="reflect",
                     padding=(4, 4),
                     activation="relu",
@@ -52,7 +52,7 @@ class StyleTransferModel(keras.models.Model):
                 UpSamplingBlock(
                     filters=32, kernel_size=3, strides=2, activation="relu"
                 ),
-                UpSamplingBlock(filters=3, kernel_size=9, strides=1, activation="tanh"),
+                UpSamplingBlock(filters=3, kernel_size=9, strides=2, activation="tanh"),
             ]
         )
 

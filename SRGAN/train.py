@@ -50,7 +50,7 @@ def train(
 
                 # Calculate loss
                 loss = losses.feature_style_loss(
-                    input_images=content_img,
+                    input_images=generated_images,
                     feature_outputs=content_outputs,
                     style_outputs=style_outputs,
                     feature_targets=content_targets,
