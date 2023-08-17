@@ -56,8 +56,8 @@ class StyleTransferModel(keras.models.Model):
             ]
         )
 
-    def call(self, x):
-        return self.model(x)
+    def call(self, x, training=True):
+        return self.model(x, training=training)
 
 
 class ConvBlock(keras.layers.Layer):
@@ -167,9 +167,13 @@ class ResidualBlock(keras.layers.Layer):
                 ),
             ]
         )
+        self.batch_norm = BatchNormalization()
+        self.relu = ReLU()
 
     def call(self, x):
-        return self.block(x) + x
+        y = self.block(x) + x
+        y = self.batch_norm(y)
+        return self.relu(y)
 
 
 if __name__ == "__main__":

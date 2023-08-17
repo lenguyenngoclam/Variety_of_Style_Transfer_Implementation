@@ -38,15 +38,15 @@ def train(
     for epoch in range(epochs):
         for batch_idx, (content_img, style_img) in enumerate(tqdm(dataset)):
             with tf.GradientTape() as tape:
-                generated_images = model(content_img)
+                generated_images = model(content_img, training=True)
 
                 # Calculate content and style outputs
-                outputs = extractor(generated_images)
+                outputs = extractor(generated_images, training=False)
                 content_outputs, style_outputs = outputs["content"], outputs["style"]
 
                 # Calculate content targets
-                content_targets = extractor(content_img)["content"]
-                style_targets = extractor(style_img)["style"]
+                content_targets = extractor(content_img, training=False)["content"]
+                style_targets = extractor(style_img, training=False)["style"]
 
                 # Calculate loss
                 loss = losses.feature_style_loss(
@@ -57,9 +57,9 @@ def train(
                     style_targets=style_targets,
                 )
 
-            grads = tape.gradient(loss, list(model.trainable_variables))
+            grads = tape.gradient(loss, model.trainable_variables)
             # Update weights
-            optim.apply_gradients(zip(grads, list(model.trainable_variables)))
+            optim.apply_gradients(zip(grads, model.trainable_variables))
 
             if (batch_idx + 1) % 1000 == 0 and batch_idx > 0:
                 print(
