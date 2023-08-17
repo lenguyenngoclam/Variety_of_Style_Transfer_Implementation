@@ -21,4 +21,4 @@ STYLE_LAYERS = [
 ]
 
 # Content layers
-CONTENT_LAYERS = ["block2_conv2"]
+CONTENT_LAYERS = ["block5_conv2"]

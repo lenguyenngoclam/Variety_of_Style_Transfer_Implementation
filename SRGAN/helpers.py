@@ -53,7 +53,7 @@ def generate_and_visualize(model, filepath):
 
     img = (img - 127.5) / 127.5
 
-    generated_img = model.predict(img)
+    generated_img = model(img, training=False)
 
     plt.imshow(tensor_to_image(generated_img))
     plt.axis("off")
